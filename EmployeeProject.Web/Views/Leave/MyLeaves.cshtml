@@ -1,0 +1,73 @@
+﻿@model List<EmployeeProject.Model.EmployeeLeaveDetail>
+
+@{
+    ViewData["Title"] = "My Leaves";
+}
+
+<h2>My Leave History</h2>
+
+<a asp-controller="Leave"
+   asp-action="ApplyLeave"
+   class="btn btn-primary mb-3">
+    Apply Leave
+</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Leave Type</th>
+            <th>From Date</th>
+            <th>To Date</th>
+            <th>Total Days</th>
+            <th>Reason</th>
+            <th>Document</th>
+            <th>Status</th>
+            <th>Approver Remarks</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var leave in Model)
+        {
+            <tr>
+                <td>@leave.LeaveType</td>
+                <td>@leave.FromDate.ToString("dd-MM-yyyy")</td>
+                <td>@leave.ToDate.ToString("dd-MM-yyyy")</td>
+                <td>@leave.TotalDays</td>
+                <td>@leave.Reason</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(leave.DocumentPath))
+                    {
+                        <a href="@leave.DocumentPath" target="_blank">View Document</a>
+                    }
+                    else
+                    {
+                        <span>Not uploaded</span>
+                    }
+                </td>
+                <td>@leave.Status</td>
+                <td>@leave.ApproverRemarks</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            const message = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    TempData["SuccessMessage"]
+                )
+            );
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Leave Applied!',
+                text: message,
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+}

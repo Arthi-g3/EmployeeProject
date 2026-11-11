@@ -1,0 +1,64 @@
+@model EmployeeProject.Model.EmployeeTask
+
+@{
+    ViewData["Title"] = "Assign Task";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4>Assign Task</h4>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Assign" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Task Title</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProjectId" class="form-label">Project</label>
+                    <select asp-for="ProjectId" class="form-select">
+                        <option value="">Select a project</option>
+                        @foreach (var project in ViewBag.Projects)
+                        {
+                            <option value="@project.ProjectId">@project.ProjectName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmpId" class="form-label">Assign To Employee</label>
+                    <select asp-for="EmpId" class="form-select">
+                        <option value="0">Select an employee</option>
+                        @foreach (var employee in ViewBag.Employees)
+                        {
+                            <option value="@employee.EmpId">@employee.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="EmpId" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">Assign Task</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

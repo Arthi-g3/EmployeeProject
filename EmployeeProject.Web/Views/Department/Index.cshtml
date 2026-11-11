@@ -1,0 +1,244 @@
+﻿@model IEnumerable<EmployeeProject.Model.Department>
+
+@{
+    ViewData["Title"] = "Department Management";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+
+    int pageSize = 5;
+    int serialNo = ((currentPage - 1) * pageSize) + 1;
+}
+
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Department Management</h2>
+            <p class="text-muted">Manage company departments.</p>
+        </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+        {
+            <a asp-controller="Department"
+               asp-action="Create"
+               class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Department
+            </a>
+        }
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 100px;">ID</th>
+                            <th>S.No</th>
+                            <th>Department Name</th>
+                            <th>Created Date</th>
+                            <th>Updated Date</th>
+                            <th style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var department in Model)
+                            {
+                                <tr>
+                                    <td>@serialNo</td>
+                                    
+                                    <td>@department.DepartmentName</td>
+                                    <td>@department.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                    <td>
+                                        @(department.UpdatedDate.HasValue
+                                            ? department.UpdatedDate.Value.ToString("dd-MM-yyyy")
+                                            : "Not updated")
+                                    </td>
+                                    <td>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                                        {
+                                            <a asp-controller="Department"
+                                               asp-action="Edit"
+                                               asp-route-id="@department.Id"
+                                              @*  class="btn btn-sm btn-warning" *@
+                                               title= "Edit">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+
+                                            <button type="button"
+                                                    @* class="btn btn-sm btn-danger" *@
+                                                    onclick="confirmDelete(@department.Id, @System.Text.Json.JsonSerializer.Serialize(department.DepartmentName))"
+                                                 title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                                serialNo++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No departments found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                  
+
+                </table>
+            </div>
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <nav>
+                        <ul class="pagination justify-content-center">
+
+                            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                    Previous
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@i">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                    Next
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                }
+            </div>
+
+        </div>
+    </div>
+ <div class="d-flex justify-content-between align-items-center mt-3">
+
+<div>
+    <small class="text-muted">
+        Total Records: @totalRecords
+    </small>
+</div>
+
+@if (totalPages > 1)
+{
+    <nav>
+        <ul class="pagination mb-0">
+
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-controller="Department"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage - 1)">
+                    Previous
+                </a>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(currentPage == i ? "active" : "")">
+                    <a class="page-link"
+                       asp-controller="Department"
+                       asp-action="Index"
+                       asp-route-page="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-controller="Department"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage + 1)">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+
+</div>
+
+</div>
+
+<form id="deleteDepartmentForm"
+      asp-controller="Department"
+      asp-action="Delete"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" id="deleteDepartmentId" name="id" />
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmDelete(id, departmentName) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Delete department "${departmentName}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteDepartmentId').value = id;
+                    document.getElementById('deleteDepartmentForm').submit();
+                }
+            });
+        }
+    </script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"])),
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"])),
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+}

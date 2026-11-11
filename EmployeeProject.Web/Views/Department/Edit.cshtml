@@ -1,0 +1,73 @@
+﻿@model EmployeeProject.Model.Department
+
+@{
+    ViewData["Title"] = "Edit Department";
+}
+
+<div class="container mt-4">
+    <h2>Edit Department</h2>
+    <p>Update the department details below.</p>
+
+    <form asp-controller="Department"
+          asp-action="Edit"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="DepartmentName" class="form-label">
+                Department Name
+            </label>
+
+            <input asp-for="DepartmentName"
+                   class="form-control"
+                   placeholder="Enter department name" />
+
+            <span asp-validation-for="DepartmentName"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Update Department
+        </button>
+
+        <a asp-controller="Department"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated!',
+                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]))
+                        });
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]))
+                        });
+        </script>
+    }
+}

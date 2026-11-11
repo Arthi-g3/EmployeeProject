@@ -1,0 +1,64 @@
+﻿@model EmployeeProject.Core.ModelView.DesignationEditModel
+
+@{
+    ViewData["Title"] = "Edit Designation";
+}
+
+<h2>Edit Designation</h2>
+
+<form asp-controller="Designation"
+      asp-action="Edit"
+      asp-route-id="@Model.DesignationId"
+      method="post">
+
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label asp-for="DepartmentId" class="form-label">
+            Department
+        </label>
+
+        <select asp-for="DepartmentId"
+                asp-items="ViewBag.Departments"
+                class="form-select">
+            <option value="">-- Select Department --</option>
+        </select>
+
+        <span asp-validation-for="DepartmentId"
+              class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="DesignationId" />
+
+    <div class="mb-3">
+        <label asp-for="DesignationName" class="form-label">
+            Designation Name
+        </label>
+
+        <input asp-for="DesignationName" class="form-control" />
+
+        <span asp-validation-for="DesignationName"
+              class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+
+        <label asp-for="IsActive" class="form-check-label">
+            Active
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Update
+    </button>
+
+    <a asp-controller="Designation"
+       asp-action="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,207 @@
+﻿
+@model IEnumerable<EmployeeProject.Model.Employee>
+@using EmployeeProject.Model
+
+@{
+    ViewData["Title"] = "Employee List";
+    var departments = ViewBag.Departments as IEnumerable<Department>;
+}
+
+<div class="container mt-4">
+    <h2>Employee Management</h2>
+    <p class="text-muted">View and manage company employee records.</p>
+    <a asp-controller="Dashboard"
+       asp-action="Index"
+       class="btn btn-secondary">
+        Back
+    </a>
+    @if (departments != null && departments.Any())
+    {
+        <div class="mb-3">
+            <label for="departmentFilter" class="form-label">
+                Filter by Department
+            </label>
+
+            <select id="departmentFilter" class="form-select">
+                <option value="">All Departments</option>
+
+                @if (ViewBag.Departments != null)
+                {
+                    foreach (var department in ViewBag.Departments)
+                    {
+                        <option value="@department.Id">
+                            @department.DepartmentName
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">No employee records found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="employeeTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Updated Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in Model)
+                    {
+                        <tr data-department-id="@emp.DepartmentId">
+                            <td>@emp.EmpId</td>
+                            <td>@emp.Name</td>
+                            <td>@emp.Email</td>
+                            <td>@(emp.Department?.DepartmentName ?? "Department not found")</td>
+                            <td>@(emp.Designation?.DesignationName ?? "Designation not found")</td>
+                            <td>
+                                @if (emp.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td>@emp.CreatedDate.ToString("dd-MM-yyyy HH:mm")</td>
+                            <td>
+                                @(emp.UpdatedDate?.ToString("dd-MM-yyyy HH:mm") ?? "Not updated")
+                            </td>
+                            <td>
+                                <a asp-controller="Employee"
+                                   asp-action="Edit"
+                                   asp-route-id="@emp.EmpId"
+                                   class="btn btn-primary btn-sm">
+                                    Edit
+                                </a>
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <form asp-controller="Employee"
+                                          asp-action="Delete"
+                                          asp-route-id="@emp.EmpId"
+                                          method="post"
+                                          class="deleteEmployeeForm d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav>
+                    <ul class="pagination justify-content-center">
+
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-controller="Employee"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                Previous
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-controller="Employee"
+                                   asp-route-page="@i">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-controller="Employee"
+                               asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                Next
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const departmentFilter = document.getElementById("departmentFilter");
+
+        if (departmentFilter) {
+            departmentFilter.addEventListener("change", function() {
+                const selectedDepartment = this.value;
+
+                document.querySelectorAll("#employeeTable tbody tr")
+                    .forEach(function(row) {
+                        const departmentId = row.dataset.departmentId;
+
+                        row.style.display =
+                            selectedDepartment === "" ||
+                                departmentId === selectedDepartment
+                                ? ""
+                                : "none";
+                    });
+            });
+        }
+
+        document.querySelectorAll(".deleteEmployeeForm").forEach(function(form) {
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This employee will be deleted permanently!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete!",
+                    cancelButtonText: "Cancel"
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: "Success!",
+                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"])),
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        </script>
+    }
+}

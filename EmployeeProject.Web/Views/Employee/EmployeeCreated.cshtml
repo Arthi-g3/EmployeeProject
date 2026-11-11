@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Employee Created";
+}
+
+<h2>Employee Account Created Successfully</h2>
+
+<div class="alert alert-success">
+    The employee account has been created.
+</div>
+
+<p>
+    <strong>Email:</strong> @TempData["CreatedEmail"]
+</p>
+
+<p>
+    <strong>Temporary Password:</strong>
+    @TempData["TemporaryPassword"]
+</p>
+
+<p class="text-warning">
+    This temporary password is for local testing only.
+    Do not share passwords insecurely in a production application.
+</p>
+
+<a asp-controller="Employee"
+   asp-action="CreateEmployee"
+   class="btn btn-primary">
+    Create Another Employee
+</a>

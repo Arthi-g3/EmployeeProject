@@ -1,0 +1,76 @@
+﻿@model EmployeeProject.Model.ViewModel.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 650px;">
+
+        <div class="card-header bg-info text-white p-3">
+            <h3 class="mb-0">
+                <i class="bi bi-person-circle me-2"></i>My Profile
+            </h3>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="text-center mb-4">
+                <i class="bi bi-person-circle text-info"
+                   style="font-size: 70px;"></i>
+
+                <h4 class="mt-2 mb-1">@Model.Name</h4>
+                <span class="badge bg-info text-dark">
+                    @Model.Role
+                </span>
+            </div>
+
+            <hr />
+
+            <div class="row mb-3">
+                <div class="col-sm-5 fw-bold">Employee ID</div>
+                <div class="col-sm-7">
+                    @(Model.EmployeeId?.ToString() ?? "Not linked")
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-5 fw-bold">Email</div>
+                <div class="col-sm-7">
+                    @(Model.Email ?? "Not available")
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-5 fw-bold">Department</div>
+                <div class="col-sm-7">
+                    @(Model.Department ?? "Not assigned")
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-5 fw-bold">Designation</div>
+                <div class="col-sm-7">
+                    @(Model.Designation ?? "Not assigned")
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-controller="Dashboard"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back to Dashboard
+                </a>
+
+                <a asp-controller="Password"
+                   asp-action="ChangePassword"
+                   class="btn btn-outline-info">
+                    <i class="bi bi-key me-1"></i>
+                    Change Password
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

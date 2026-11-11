@@ -1,0 +1,203 @@
+﻿@model List<EmployeeProject.Model.EmployeeLeaveDetail>
+
+@{
+    ViewData["Title"] = "Pending Leave Requests";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = 5;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+
+    int serialNo = ((currentPage - 1) * pageSize) + 1;
+}
+
+<div class="container-fluid mt-4">
+    <form asp-controller="Leave" asp-action="PendingLeaves" method="get"
+          class="d-flex gap-2 mt-3 mb-3">
+
+        <select name="status" class="form-select" style="max-width: 200px;">
+             <option value="All" selected="@(ViewBag.SelectedStatus == "All")">
+                All
+            </option>
+            <option value="Pending" selected="@(ViewBag.SelectedStatus == "Pending")">
+                Pending
+            </option>
+            <option value="Approved" selected="@(ViewBag.SelectedStatus == "Approved")">
+                Approved
+            </option>
+            <option value="Rejected" selected="@(ViewBag.SelectedStatus == "Rejected")">
+                Rejected
+            </option>
+           
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <!-- Back Button - Right -->
+    <a asp-controller="Leave"
+       asp-action="PendingLeaves"
+       class="btn btn-secondary">
+        Back
+    </a>
+    <h2>Pending Leave Requests</h2>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-striped align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>S.No</th>
+                    <th>Employee Name</th>
+                    <th>Leave Type</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Total Days</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th style="min-width: 250px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var leave in Model)
+                    {
+                        <tr>
+                            <td>@serialNo</td>
+
+                            <td>@leave.Employee?.Name</td>
+
+                            <td>@leave.LeaveType</td>
+
+                            <td>@leave.FromDate.ToString("dd-MMM-yyyy")</td>
+
+                            <td>@leave.ToDate.ToString("dd-MMM-yyyy")</td>
+
+                            <td>@leave.TotalDays</td>
+
+                            <td>
+                                <div style="max-width:250px; overflow-wrap:anywhere;">
+                                    @leave.Reason
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    @leave.Status
+                                </span>
+                            </td>
+
+                            <td>
+                                <form asp-controller="Leave"
+                                      asp-action="ApproveReject"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="LeaveId"
+                                           value="@leave.LeaveId" />
+
+                                    <textarea name="ApproverRemarks"
+                                              class="form-control mb-2"
+                                              rows="2"
+                                              placeholder="Enter remarks"></textarea>
+
+                                    <div class="d-flex gap-2">
+
+                                        <button type="submit"
+                                                name="Status"
+                                                value="Approved"
+                                                class="btn btn-success btn-sm">
+                                            Approve
+                                        </button>
+
+                                        <button type="submit"
+                                                name="Status"
+                                                value="Rejected"
+                                                class="btn btn-danger btn-sm">
+                                            Reject
+                                        </button>
+
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+
+                        serialNo++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            No pending leave requests found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <span>Total Records: @totalRecords</span>
+
+        <nav>
+            <ul class="pagination mb-0">
+
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-controller="Leave"
+                       asp-action="PendingLeaves"
+                       asp-route-page="@(currentPage - 1)">
+                        Previous
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link"
+                           asp-controller="Leave"
+                           asp-action="PendingLeaves"
+                           asp-route-page="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-controller="Leave"
+                       asp-action="PendingLeaves"
+                       asp-route-page="@(currentPage + 1)">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</div>
+@section Scripts {
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            const message = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    TempData["SuccessMessage"]
+                )
+            );
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Leave Updated!',
+                text: message,
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+}

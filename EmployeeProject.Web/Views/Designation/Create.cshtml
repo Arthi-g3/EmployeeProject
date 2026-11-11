@@ -1,0 +1,76 @@
+﻿@model EmployeeProject.Core.ModelView.DesignationcrateView
+
+@{
+    ViewData["Title"] = "Create Designation";
+}
+
+<div class="container">
+    <h2 class="mb-4">Create Designation</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-controller="Designation"
+                  asp-action="Create"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+                <div class="col-md-6">
+                    <label asp-for="DepartmentId" class="form-label">
+                        Department
+                    </label>
+
+                    <select asp-for="DepartmentId"
+                            class="form-select"
+                            asp-items="ViewBag.Departments"
+                            id="DepartmentId">
+                        <option value="">-- Select Department --</option>
+                    </select>
+
+                    <span asp-validation-for="DepartmentId"
+                          class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+    <label asp-for="DesignationName" class="form-label">
+        Designation Name
+    </label>
+
+    <input asp-for="DesignationName"
+           class="form-control"
+           placeholder="Enter designation name" />
+
+    <span asp-validation-for="DesignationName"
+          class="text-danger"></span>
+</div>
+           
+                <div class="form-check mb-3">
+                    <input asp-for="IsActive"
+                           class="form-check-input" />
+
+                    <label asp-for="IsActive"
+                           class="form-check-label">
+                        Active
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i>
+                    Save Designation
+                </button>
+
+                <a asp-controller="Designation"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,155 @@
+﻿
+@model EmployeeProject.Core.DesignationIndexViewModel
+
+@{
+    ViewData["Title"] = "Designation List";
+    int pageSize = 5;
+    int serialNo = ((Model.CurrentPage - 1) * pageSize) + 1;
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Designation List</h2>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+        {
+            <a asp-controller="Designation"
+               asp-action="Create"
+               class="btn btn-primary">
+                Add Designation
+            </a>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>s.No</th>
+                    <th>Designation Name</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null &&
+                     Model.Designations != null &&
+                     Model.Designations.Any())
+                {
+                    foreach (var item in Model.Designations)
+                    {
+                        <tr>
+                            <td>@serialNo</td>
+
+                            <td>@item.DesignationName</td>
+
+                            <td>
+                                @item.Department?.DepartmentName
+                            </td>
+
+                            <td>
+                                 <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+                                
+                            </td>
+
+                            <td>
+                                @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                                {
+                                    <a asp-controller="Designation"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.DesignationId"
+                                       class="btn btn-warning btn-sm">
+                                        Edit
+                                    </a>
+
+                                    <a asp-controller="Designation"
+                                       asp-action="Delete"
+                                       asp-route-id="@item.DesignationId"
+                                       class="btn btn-danger btn-sm">
+                                        Delete
+                                    </a>
+                                }
+
+                                <a asp-controller="Designation"
+                                   asp-action="Details"
+                                   asp-route-id="@item.DesignationId"
+                                   class="btn btn-info btn-sm">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                        serialNo++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            No designations found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <div>
+            <small class="text-muted">
+                Total Records: @Model.TotalRecords
+            </small>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav>
+                <ul class="pagination mb-0">
+
+                    <!-- Previous -->
+                    <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-controller="Designation"
+                           asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage - 1)">
+                            Previous
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                            <a class="page-link"
+                               asp-controller="Designation"
+                               asp-action="Index"
+                               asp-route-page="@i">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Next -->
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-controller="Designation"
+                           asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage + 1)">
+                            Next
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        }
+
+    </div>
+
+</div>

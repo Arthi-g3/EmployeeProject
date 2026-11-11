@@ -1,0 +1,243 @@
+﻿
+@model EmployeeProject.Core.ModelView.ApplyLeaveViewModel
+
+@{
+    ViewData["Title"] = "Apply Leave";
+}
+
+<h2>Apply Leave</h2>
+
+<form asp-controller="Leave"
+      asp-action="ApplyLeave"
+      method="post"
+      enctype="multipart/form-data"
+      id="leaveForm">
+
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Leave Type -->
+    <div class="mb-3">
+        <label asp-for="LeaveType" class="form-label">Leave Type</label>
+
+        <select asp-for="LeaveType" id="LeaveType" class="form-select">
+            <option value="">Select Leave Type</option>
+            <option value="Casual">Casual Leave</option>
+            <option value="Sick">Sick Leave</option>
+            <option value="Earned">Earned Leave</option>
+        </select>
+
+        <span asp-validation-for="LeaveType" class="text-danger"></span>
+    </div>
+
+    <!-- From Date -->
+    <div class="mb-3">
+        <label asp-for="FromDate" class="form-label">From Date</label>
+
+        <input asp-for="FromDate"
+               type="date"
+               class="form-control"
+               id="FromDate" />
+
+        <span asp-validation-for="FromDate" class="text-danger"></span>
+    </div>
+
+    <!-- To Date -->
+    <div class="mb-3">
+        <label asp-for="ToDate" class="form-label">To Date</label>
+
+        <input asp-for="ToDate"
+               type="date"
+               class="form-control"
+               id="ToDate" />
+
+        <span asp-validation-for="ToDate" class="text-danger"></span>
+    </div>
+
+    <!-- Total Days -->
+    <div class="mb-3">
+        <label class="form-label">Total Leave Days</label>
+
+        <input type="text"
+               id="TotalDays"
+               class="form-control"
+               readonly />
+    </div>
+
+    <!-- Reason -->
+    <div class="mb-3">
+        <label asp-for="Reason" class="form-label">Description</label>
+
+        <textarea asp-for="Reason"
+                  id="Reason"
+                  class="form-control"
+                  rows="4"
+                  maxlength="250"
+                  placeholder="Enter your leave reason"></textarea>
+
+        <span asp-validation-for="Reason" class="text-danger"></span>
+
+        <div class="text-end">
+            <small id="charCount" class="text-muted">
+                0 / 250 characters
+            </small>
+        </div>
+    </div>
+
+    <!-- Document Upload -->
+    <div class="mb-3" id="documentSection" style="display:none;">
+
+        <label asp-for="Document" class="form-label">
+            Supporting Medical Document
+        </label>
+
+        <input asp-for="Document"
+               id="Document"
+               type="file"
+               class="form-control"
+               accept=".pdf,.jpg,.jpeg,.png" />
+
+        <small class="text-muted">
+            Medical proof is mandatory for Sick Leave of 2 days or more.
+        </small>
+
+        <span asp-validation-for="Document" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Submit Leave
+    </button>
+
+    <a asp-controller="Leave"
+       asp-action="MyLeaves"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const leaveType = document.getElementById("LeaveType");
+            const fromDate = document.getElementById("FromDate");
+            const toDate = document.getElementById("ToDate");
+
+            const totalDays = document.getElementById("TotalDays");
+
+            const documentSection =
+                document.getElementById("documentSection");
+
+            const documentInput =
+                document.getElementById("Document");
+
+            const reasonBox =
+                document.getElementById("Reason");
+
+            const charCount =
+                document.getElementById("charCount");
+
+            // Sick Leave date restriction
+            function updateMinDate() {
+
+                if (leaveType.value === "Sick") {
+
+                    const today = new Date();
+
+                    const year = today.getFullYear();
+                    const month = String(
+                        today.getMonth() + 1
+                    ).padStart(2, "0");
+
+                    const day = String(
+                        today.getDate()
+                    ).padStart(2, "0");
+
+                    fromDate.min = `${year}-${month}-${day}`;
+
+                }
+                else {
+                    fromDate.removeAttribute("min");
+                }
+
+                // Remove existing From Date if invalid
+                if (leaveType.value === "Sick" &&
+                    fromDate.value &&
+                    fromDate.value < fromDate.min) {
+
+                    fromDate.value = "";
+                }
+
+                calculateDays();
+            }
+
+            // Calculate leave duration
+            function calculateDays() {
+
+                let days = 0;
+
+                if (fromDate.value && toDate.value) {
+
+                    const from = new Date(
+                        fromDate.value + "T00:00:00"
+                    );
+
+                    const to = new Date(
+                        toDate.value + "T00:00:00"
+                    );
+
+                    days = Math.round(
+                        (to - from) / 86400000
+                    ) + 1;
+
+                    if (days <= 0) {
+                        days = 0;
+                    }
+                }
+
+                totalDays.value =
+                    days > 0 ? days + " Days" : "";
+
+                // Show document for Sick Leave of 2 days or more
+                if (leaveType.value === "Sick" && days >= 2) {
+
+                    documentSection.style.display = "block";
+                    documentInput.required = true;
+
+                }
+                else {
+
+                    documentSection.style.display = "none";
+                    documentInput.required = false;
+                    documentInput.value = "";
+                }
+            }
+
+            // Character count
+            function updateCharacterCount() {
+
+                charCount.textContent =
+                    reasonBox.value.length + " / 250 characters";
+            }
+
+            // Event listeners
+            leaveType.addEventListener("change", updateMinDate);
+
+            fromDate.addEventListener("change", calculateDays);
+
+            toDate.addEventListener("change", calculateDays);
+
+            reasonBox.addEventListener("input", updateCharacterCount);
+
+            // Initial calculation
+            updateMinDate();
+            updateCharacterCount();
+
+        });
+    </script>
+}

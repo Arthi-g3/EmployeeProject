@@ -1,0 +1,64 @@
+@model EmployeeProject.Core.ModelView.TimesheetCreateViewModel
+
+@{
+    ViewData["Title"] = "Submit Timesheet";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4>Submit Timesheet</h4>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="WorkDate" class="form-label">Work Date</label>
+                    <input asp-for="WorkDate" type="date" class="form-control" />
+                    <span asp-validation-for="WorkDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProjectId" class="form-label">Project</label>
+                    <select asp-for="ProjectId" class="form-select">
+                        <option value="0">Select a project</option>
+                        @foreach (var project in ViewBag.Projects)
+                        {
+                            <option value="@project.ProjectId">@project.ProjectName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Hours" class="form-label">Hours Worked</label>
+                    <input asp-for="Hours" type="number" min="1" max="8" step="0.25" class="form-control" />
+                    <span asp-validation-for="Hours" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TaskReference" class="form-label">Task Reference</label>
+                    <input asp-for="TaskReference" class="form-control" maxlength="100" />
+                    <span asp-validation-for="TaskReference" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" maxlength="1000"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">Submit Timesheet</button>
+                <a asp-action="MyTimesheets" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

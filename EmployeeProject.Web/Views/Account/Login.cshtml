@@ -1,0 +1,447 @@
+﻿@model EmployeeProject.Core.ModelView.LoginView
+
+@{
+    ViewData["Title"] = "Sign In | WorkforceHub";
+    Layout = "~/Views/Shared/LoginLayout.cshtml";
+}
+
+<style>
+    :root {
+        --primary: #3457d5;
+        --primary-dark: #2643b0;
+        --text: #172033;
+        --muted: #667085;
+        --border: #dfe4ee;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 680px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(28, 45, 90, .10);
+    }
+
+    .brand-panel {
+        background: linear-gradient(145deg, #243d9e, #456be7);
+        color: white;
+        padding: 52px 44px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .brand-panel::before,
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 50%;
+            width: 320px;
+            height: 320px;
+            right: -150px;
+            top: 100px;
+        }
+
+        .brand-panel::after {
+            width: 430px;
+            height: 430px;
+            right: -200px;
+            top: 45px;
+        }
+
+    .brand-content,
+    .brand-footer {
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .brand-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: rgba(255,255,255,.16);
+        font-size: 25px;
+    }
+
+    .brand-heading {
+        margin-top: 85px;
+        font-size: clamp(30px, 4vw, 43px);
+        line-height: 1.2;
+        font-weight: 700;
+    }
+
+    .brand-description {
+        margin-top: 20px;
+        max-width: 350px;
+        color: rgba(255,255,255,.83);
+        line-height: 1.8;
+        font-size: 15px;
+    }
+
+    .brand-footer {
+        color: rgba(255,255,255,.72);
+        font-size: 12px;
+    }
+
+    .form-panel {
+        padding: 55px 64px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .welcome-label {
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .form-title {
+        font-size: 31px;
+        font-weight: 700;
+        margin: 10px 0 8px;
+    }
+
+    .form-subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .input-group-custom {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+        .input-group-custom .form-control {
+            height: 49px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 44px;
+            font-size: 14px;
+            box-shadow: none;
+        }
+
+            .input-group-custom .form-control:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(52,87,213,.10);
+            }
+
+    .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: #8b95a7;
+        z-index: 5;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 13px;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #7b8495;
+        z-index: 5;
+        cursor: pointer;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+    .form-check-label {
+        color: var(--muted);
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .login-button {
+        width: 100%;
+        height: 49px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--primary);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 25px;
+        transition: background .2s, transform .2s;
+    }
+
+        .login-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+    .access-note {
+        margin-top: 25px;
+        padding: 13px;
+        background: #f6f8fc;
+        border: 1px solid #edf0f6;
+        border-radius: 9px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+        text-align: center;
+    }
+
+        .access-note i {
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+    .validation-summary-errors,
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 12px;
+    }
+
+        .validation-summary-errors ul {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+    .footer-note {
+        text-align: center;
+        color: #98a1b2;
+        font-size: 11px;
+        margin-top: 25px;
+    }
+
+    @@media (max-width: 768px) {
+        .login-wrapper {
+            padding: 12px;
+        }
+
+        .login-card {
+            max-width: 470px;
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+
+        .brand-panel {
+            padding: 28px;
+            min-height: 210px;
+        }
+
+        .brand-heading {
+            margin-top: 30px;
+            font-size: 28px;
+        }
+
+        .brand-description,
+        .brand-footer {
+            display: none;
+        }
+
+        .form-panel {
+            padding: 35px 28px;
+        }
+
+        .form-title {
+            font-size: 27px;
+        }
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <section class="brand-panel">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <div class="brand-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <span>WorkforceHub</span>
+                </div>
+
+                <h1 class="brand-heading">
+                    Your Workforce,<br />
+                    Connected.
+                </h1>
+
+                <p class="brand-description">
+                    One secure place to manage your workforce,
+                    access employee information, and stay connected
+                    with your organization.
+                </p>
+            </div>
+
+            <div class="brand-footer">
+                © @DateTime.Now.Year WorkforceHub. All rights reserved.
+            </div>
+        </section>
+
+        <section class="form-panel">
+            <div class="welcome-label">Welcome back</div>
+
+            <h2 class="form-title">Sign in to your account</h2>
+
+            <p class="form-subtitle">
+                Enter your work credentials to continue.
+            </p>
+
+            <form asp-controller="Account"
+                  asp-action="Login"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        Email Address
+                    </label>
+
+                    <div class="input-group-custom">
+                        <i class="bi bi-envelope input-icon"></i>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               type="email"
+                               placeholder="name@company.com"
+                               autocomplete="username"
+                               autofocus />
+                    </div>
+
+                    <span asp-validation-for="Email"
+                          class="field-validation-error"></span>
+                </div>
+                <div class="text-end mb-3">
+                    <a asp-controller="Password"
+                       asp-action="ForgotPassword"
+                       class="text-decoration-none">
+                        Forgot Password?
+                    </a>
+                </div>
+                <div>
+                    <label asp-for="Password" class="form-label">
+                        Password
+                    </label>
+
+                    <div class="input-group-custom">
+                        <i class="bi bi-lock input-icon"></i>
+
+                        <input asp-for="Password"
+                               id="passwordInput"
+                               class="form-control"
+                               type="password"
+                               placeholder="Enter your password"
+                               autocomplete="current-password" />
+
+                        <button type="button"
+                                class="password-toggle"
+                                id="togglePassword"
+                                aria-label="Show password">
+                            <i class="bi bi-eye" id="passwordIcon"></i>
+                        </button>
+                    </div>
+
+                    <span asp-validation-for="Password"
+                          class="field-validation-error"></span>
+                </div>
+
+                <div class="form-check mt-2">
+                    <input asp-for="RememberMe"
+                           class="form-check-input" />
+
+                    <label asp-for="RememberMe"
+                           class="form-check-label">
+                        Remember me
+                    </label>
+                </div>
+
+                <button type="submit" class="login-button">
+                    Sign In <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+
+                <div class="access-note">
+                    <i class="bi bi-shield-lock"></i>
+                    Contact your Admin or HR for account access.
+                </div>
+            </form>
+
+            <div class="footer-note">
+                Secure employee access · WorkforceHub
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById("passwordInput");
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordIcon = document.getElementById("passwordIcon");
+
+    togglePassword.addEventListener("click", function() {
+        const isPassword = passwordInput.type === "password";
+
+        passwordInput.type = isPassword ? "text" : "password";
+        passwordIcon.className = isPassword
+            ? "bi bi-eye-slash"
+            : "bi bi-eye";
+
+        togglePassword.setAttribute(
+            "aria-label",
+            isPassword ? "Hide password" : "Show password"
+        );
+
+    });
+
+</script>
+@if (TempData["Success"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]))
+                });
+    </script>
+}

@@ -1,0 +1,53 @@
+@model List<EmployeeProject.Model.Timesheet>
+
+@{
+    ViewData["Title"] = "Employee Timesheets";
+}
+
+<div class="container mt-4">
+    <h2>Employee Timesheets</h2>
+    <hr />
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Work Date</th>
+                        <th>Project</th>
+                        <th>Hours</th>
+                        <th>Task Reference</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Submitted Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var timesheet in Model)
+                    {
+                        <tr>
+                            <td>@timesheet.Employee?.Name</td>
+                            <td>@timesheet.WorkDate.ToString("dd-MM-yyyy")</td>
+                            <td>@timesheet.Project?.ProjectName</td>
+                            <td>@timesheet.Hours</td>
+                            <td>@timesheet.TaskReference</td>
+                            <td>@timesheet.Description</td>
+                            <td>@timesheet.Status</td>
+                            <td>@timesheet.SubmittedDate.ToString("dd-MM-yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No employee timesheets have been submitted.</p>
+    }
+
+    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
+        Back to Dashboard
+    </a>
+</div>

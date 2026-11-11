@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EmployeeProject.Core/EmployeeProject.Core.csproj" />
+  <Project Path="EmployeeProject.Model/EmployeeProject.Model.csproj" />
+  <Project Path="EmployeeProject.Web/EmployeeProject.Web.csproj" />
+  <Project Path="EmployeeProject/EmployeeProject.Data.csproj" />
+</Solution>
