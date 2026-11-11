@@ -135,6 +135,10 @@ namespace EmployeeProject
                 .HasForeignKey(t => t.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Timesheet>()
+    .Property(t => t.Hours)
+    .HasPrecision(5, 2);
+
         }
     }
 }

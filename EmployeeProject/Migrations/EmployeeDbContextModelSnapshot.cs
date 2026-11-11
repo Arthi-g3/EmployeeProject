@@ -428,6 +428,53 @@ namespace EmployeeProject.Data.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("EmployeeProject.Model.Timesheet", b =>
+                {
+                    b.Property<int>("TimesheetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TimesheetId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Hours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TaskReference")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("WorkDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TimesheetId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("EmployeeId", "WorkDate")
+                        .IsUnique();
+
+                    b.ToTable("Timesheets");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -641,6 +688,25 @@ namespace EmployeeProject.Data.Migrations
                     b.Navigation("EmployeeLeaveDetail");
                 });
 
+            modelBuilder.Entity("EmployeeProject.Model.Timesheet", b =>
+                {
+                    b.HasOne("EmployeeProject.Model.Employee", "Employee")
+                        .WithMany("Timesheets")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EmployeeProject.Model.Project", "Project")
+                        .WithMany("Timesheets")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -704,9 +770,16 @@ namespace EmployeeProject.Data.Migrations
                     b.Navigation("Employees");
                 });
 
+            modelBuilder.Entity("EmployeeProject.Model.Employee", b =>
+                {
+                    b.Navigation("Timesheets");
+                });
+
             modelBuilder.Entity("EmployeeProject.Model.Project", b =>
                 {
                     b.Navigation("EmployeeTasks");
+
+                    b.Navigation("Timesheets");
                 });
 #pragma warning restore 612, 618
         }
