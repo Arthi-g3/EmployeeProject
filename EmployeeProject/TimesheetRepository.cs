@@ -26,15 +26,7 @@ namespace EmployeeProject.Data
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Timesheet>> GetByEmployeeIdAsync(int employeeId)
-        {
-            
-                .Include(t => t.Project)
-                .Where(t => t.EmployeeId == employeeId)
-                .OrderByDescending(t => t.WorkDate)
-                .ThenByDescending(t => t.TimesheetId)
-                .ToListAsync();
-        }
+   
 
         public async Task<List<Timesheet>> GetAllAsync()
         {
